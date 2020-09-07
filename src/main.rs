@@ -96,14 +96,11 @@ impl<T: Life> Life for ListF<T> {
     type L<'l> = List<'l, T>;
 }
 
-fn foo<'l, 'a: 'l, 'b: 'l, T: Life + Eq>(a: T::L<'a>, b: Gc<'b, ListF<T>>) {
-    // let a: List<'l, T> = List::Cons(a, b); //~ [rustc E0623] [E] lifetime mismatch ...but data from `b` flows into `a` here
+fn foo<'a, 'b, T: Life + Eq>(a: T::L<'a>, b: Gc<'b, ListF<T>>) {
+    let a: List<'_, T> = List::Cons(a, b); //~ [rustc E0624] [E] lifetime mismatch ...but data from `b` flows into `a` here
 }
 
-fn foo_usize<'l, 'a: 'l, 'b: 'l>(
-    a: <PF<usize> as Life>::L<'a>,
-    b: Gc<'b, ListF<PF<usize>>>,
-) -> bool {
-    let a: List<'l, PF<usize>> = List::Cons(a, b);
+fn foo_usize<'a, 'b>(a: <PF<usize> as Life>::L<'a>, b: Gc<'b, ListF<PF<usize>>>) -> bool {
+    let a: List<'_, PF<usize>> = List::Cons(a, b);
     a == *b
 }
