@@ -61,7 +61,7 @@ fn bad<'a, 'b, T: Life + Eq>(a: Gc<'a, T>, b: Gc<'b, T>) -> bool
 where
     for<'l> T::L<'l>: Eq,
 {
-    // *a == *b; //~ [rustc E0623] [E] lifetime mismatch ...but data from `b` flows into `a` here
+    *a == *b; //~ [rustc E0623] [E] lifetime mismatch ...but data from `b` flows into `a` here
     a == b
 }
 
@@ -102,5 +102,10 @@ fn foo<'a, 'b, T: Life + Eq>(a: T::L<'a>, b: Gc<'b, ListF<T>>) {
 
 fn foo_usize<'a, 'b>(a: <PF<usize> as Life>::L<'a>, b: Gc<'b, ListF<PF<usize>>>) -> bool {
     let a: List<'_, PF<usize>> = List::Cons(a, b);
+    a == *b
+}
+
+fn foo_prim<'a, 'b, T: 'static + NoGc + Eq>(a: <PF<T> as Life>::L<'a>, b: Gc<'b, ListF<PF<T>>>) -> bool {
+    let a: List<'_, PF<T>> = List::Cons(a, b);
     a == *b
 }
