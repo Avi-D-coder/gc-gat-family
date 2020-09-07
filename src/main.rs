@@ -22,13 +22,10 @@ trait Life: 'static {
     type L<'l>: Type<T = Self>;
 }
 
-#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
-struct PF<T: 'static + NoGc>(PhantomData<T>);
-
 impl<T: 'static + NoGc> Type for T {
-    type T = PF<T>;
+    type T = T;
 }
-impl<T: 'static + NoGc> Life for PF<T> {
+impl<T: 'static + NoGc> Life for T {
     type L<'l> = T;
 }
 
@@ -65,7 +62,7 @@ where
     a == b
 }
 
-fn good_concreate<'a, 'b, T: Life>(a: Gc<'a, PF<usize>>, b: Gc<'b, PF<usize>>) -> bool {
+fn good_concreate<'a, 'b, T: Life>(a: Gc<'a, usize>, b: Gc<'b, usize>) -> bool {
     let _ = a == b;
     *a == *b
 }
@@ -100,12 +97,12 @@ fn foo<'a, 'b, T: Life + Eq>(a: T::L<'a>, b: Gc<'b, ListF<T>>) {
     let a: List<'_, T> = List::Cons(a, b); //~ [rustc E0624] [E] lifetime mismatch ...but data from `b` flows into `a` here
 }
 
-fn foo_usize<'a, 'b>(a: <PF<usize> as Life>::L<'a>, b: Gc<'b, ListF<PF<usize>>>) -> bool {
-    let a: List<'_, PF<usize>> = List::Cons(a, b);
+fn foo_usize<'a, 'b>(a: <usize as Life>::L<'a>, b: Gc<'b, ListF<usize>>) -> bool {
+    let a: List<'_, usize> = List::Cons(a, b);
     a == *b
 }
 
-fn foo_prim<'a, 'b, T: 'static + NoGc + Eq>(a: <PF<T> as Life>::L<'a>, b: Gc<'b, ListF<PF<T>>>) -> bool {
-    let a: List<'_, PF<T>> = List::Cons(a, b);
+fn foo_prim<'a, 'b, T: 'static + NoGc + Eq>(a: <T as Life>::L<'a>, b: Gc<'b, ListF<T>>) -> bool {
+    let a: List<'_, T> = List::Cons(a, b);
     a == *b
 }
