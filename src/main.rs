@@ -134,3 +134,13 @@ mod map {
         type L<'l> = Node<'l, K, V>;
     }
 }
+
+/// Failed attempt at tuples.
+// struct T2<'r, A:Life, B: Life>((A::L<'r>, B::L<'r>), PhantomData<Gc<'r, ()>>);
+// struct T2F<A, B>(PhantomData<GcF<(A, B)>>);
+// impl<'r, A: Life, B: Life> Type for T2<'r, A, B> {
+//     type T = T2F<A, B>;
+// }
+// impl<A: Life, B: Life> Life for T2F<A, B> {
+//     type L<'l> = T2<'l, A::L<'l>, B::L<'l>>;
+// }
