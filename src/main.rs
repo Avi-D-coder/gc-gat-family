@@ -106,3 +106,31 @@ fn foo_prim<'a, 'b, T: 'static + NoGc + Eq>(a: <T as Life>::L<'a>, b: Gc<'b, Lis
     let a: List<'_, T> = List::Cons(a, b);
     a == *b
 }
+
+mod map {
+    use crate::*;
+    struct Map<'r, K: Life, V: Life>(Option<Gc<'r, NodeF<K, V>>>);
+    struct Node<'r, K: Life, V: Life> {
+        key: K::L<'r>,
+        size: usize,
+        left: Map<'r, K, V>,
+        right: Map<'r, K, V>,
+        value: V::L<'r>,
+    }
+    pub struct MapF<K, V>(PhantomData<GcF<(K, V)>>);
+    pub struct NodeF<K, V>(PhantomData<GcF<(K, V)>>);
+
+    impl<'r, K: Life, V: Life> Type for Map<'r, K, V> {
+        type T = MapF<K, V>;
+    }
+    impl<K: Life, V: Life> Life for MapF<K, V> {
+        type L<'l> = Map<'l, K, V>;
+    }
+
+    impl<'r, K: Life, V: Life> Type for Node<'r, K, V> {
+        type T = NodeF<K, V>;
+    }
+    impl<K: Life, V: Life> Life for NodeF<K, V> {
+        type L<'l> = Node<'l, K, V>;
+    }
+}
